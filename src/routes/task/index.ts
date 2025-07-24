@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import z from "zod";
 
 const createTaskSchema = z.object({
-	description: z.string().min(1, "Name is required"),
+	description: z.string().min(1, "Description is required"),
 });
 
 const updateTaskSchema = z
@@ -24,18 +24,18 @@ type TCreateSchema = { description: string; id: string; completed: boolean };
 const taskList: TCreateSchema[] = [];
 
 export async function taskRoutes(server: FastifyInstance) {
-	server.get("/", (_, reply) => {
-		reply.status(200).send({
+	server.get("/", (_, response) => {
+		response.status(200).send({
 			task: taskList,
 		});
 	});
 
-	server.post("/", (request, reply) => {
+	server.post("/", (request, response) => {
 		const parseResult = createTaskSchema.safeParse(request.body);
 
 		if (!parseResult.success) {
-			return reply.status(400).send({
-				errors: parseResult.error.issues,
+			return response.status(400).send({
+				error: parseResult.error.issues,
 			});
 		}
 
@@ -47,17 +47,17 @@ export async function taskRoutes(server: FastifyInstance) {
 			completed: false,
 		});
 
-		reply.status(201).send({
+		response.status(201).send({
 			message: `Task created: ${taskId}`,
 		});
 	});
 
-	server.put("/", (request, reply) => {
+	server.put("/", (request, response) => {
 		const parseResult = updateTaskSchema.safeParse(request.body);
 
 		if (!parseResult.success) {
-			return reply.status(400).send({
-				errors: parseResult.error.issues,
+			return response.status(400).send({
+				error: parseResult.error.issues,
 			});
 		}
 
@@ -65,15 +65,33 @@ export async function taskRoutes(server: FastifyInstance) {
 		const indexIdList = taskList.findIndex((i) => i.id === id);
 
 		if (indexIdList === -1) {
-			return reply.status(400).send({
-				errors: "task ID not found",
+			return response.status(400).send({
+				error: "task ID not found",
 			});
 		}
 
 		Object.assign(taskList[indexIdList], parseResult.data);
 
-		return reply.status(200).send({
+		return response.status(200).send({
 			message: `Update task ${id} successfully`,
+		});
+	});
+
+	server.delete("/:id", (request, response) => {
+		const { id } = request.params as { id: string };
+
+		const indexIdList = taskList.findIndex((i) => i.id === id);
+
+		if (indexIdList === -1) {
+			return response.status(400).send({
+				error: "task ID not found",
+			});
+		}
+
+		taskList.splice(indexIdList, 1);
+
+		return response.status(200).send({
+			message: `Task ${id} deleted successfully.`,
 		});
 	});
 }
