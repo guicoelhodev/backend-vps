@@ -16,7 +16,7 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE ${PORT}
+EXPOSE 3000
 
 CMD ["node", "build/index.js"]
 
