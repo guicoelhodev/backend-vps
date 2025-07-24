@@ -1,19 +1,10 @@
 import fastify from "fastify";
 import "dotenv/config";
+import { registerRoutes } from "./routes";
 
 const server = fastify();
 
-server.get("/health", async (_, reply) => {
-	try {
-		reply.send({ status: "Server is running correctly" });
-	} catch (err) {
-		server.log.error(err);
-		return reply.status(500).send({
-			error: "Internal server error",
-			description: (err as Error).message,
-		});
-	}
-});
+registerRoutes(server);
 
 server.listen({ port: Number(process.env.PORT) || 8080 }, (err, address) => {
 	if (err) {
