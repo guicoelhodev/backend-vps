@@ -1,22 +1,26 @@
 import fastify from "fastify";
 import "dotenv/config";
 import { registerRoutes } from "./presentation/routes";
+import { PrismaDataSource } from "./data/datasource/PrismaDataSource";
 
 const server = fastify();
 
-registerRoutes(server);
+async function bootstrap() {
+	try {
+		await PrismaDataSource.connect();
 
-server.listen(
-	{
-		port: Number(process.env.PORT) || 8080,
-		host: "0.0.0.0",
-	},
-	(err, address) => {
-		if (err) {
-			server.log.error(err);
-			process.exit(1);
-		}
+		registerRoutes(server);
 
-		console.log(`Server is now listening on ${address}`);
-	},
-);
+		await server.listen({
+			port: Number(process.env.PORT) || 8080,
+			host: "0.0.0.0",
+		});
+
+		console.log("Server is now listening");
+	} catch (err) {
+		console.error("Failed to start server:", err);
+		process.exit(1);
+	}
+}
+
+bootstrap();

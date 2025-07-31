@@ -4,7 +4,7 @@ import { TaskRepository } from "@/domain/task/repositories/TaskRepository";
 import { Task, TTask } from "@/domain/task/entities/Task";
 
 export class PrismaTaskRepository implements TaskRepository {
-	private prisma: PrismaClient
+	private prisma: PrismaClient;
 
 	constructor() {
 		this.prisma = PrismaDataSource.getInstance();
@@ -14,18 +14,22 @@ export class PrismaTaskRepository implements TaskRepository {
 		const taskData = task.getTask();
 
 		const taskPrisma = await this.prisma.task.create({
-			data: taskData
+			data: taskData,
 		});
 
-		return taskPrisma
+		return taskPrisma;
 	}
 
 	async getTask(taskId: string): Promise<TTask | null> {
-
 		const taskPrisma = await this.prisma.task.findFirst({
-			where: { id: taskId }
+			where: { id: taskId },
 		});
 
-		return taskPrisma
+		return taskPrisma;
+	}
+
+	async getAllTasks(): Promise<TTask[]> {
+		const tasks = await this.prisma.task.findMany();
+		return tasks;
 	}
 }
