@@ -10,15 +10,15 @@ export class TaskUseCase {
 		return uuidRegex.test(uuid);
 	}
 
-	async getTask(taskId: string): Promise<Task | null> {
+	async getTask(taskId: string) {
 		if (!this.isValidUUID(taskId)) {
 			throw new Error("Invalid taskId");
 		}
 
-		return this.taskRepository.getTask(taskId);
+		return await this.taskRepository.getTask(taskId);
 	}
 
-	async createTask(description: string): Promise<Task> {
+	async createTask(description: string) {
 		if (!description.length) throw new Error("Description cannot be empty");
 
 		const task = new Task({
@@ -28,6 +28,6 @@ export class TaskUseCase {
 			completed: false,
 		});
 
-		return this.taskRepository.createTask(task);
+		return await this.taskRepository.createTask(task);
 	}
 }
