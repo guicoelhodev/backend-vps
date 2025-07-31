@@ -1,19 +1,23 @@
 import z from "zod";
-import { TaskUseCase } from "@/domain/task/useCases/TaskUseCase";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { CreateTaskUseCase } from "@/application/useCases/task/CreateTaskUseCase";
+import { GetTaskUseCase } from "@/application/useCases/task/GetTaskUseCase";
 
 const createTaskSchema = z.object({
 	description: z.string().min(1, "Description is requestuired"),
 });
 export class TaskController {
-	constructor(private taskUseCase: TaskUseCase) { }
+	constructor(
+		private createTaskUseCase: CreateTaskUseCase,
+		private getTaskUseCase: GetTaskUseCase,
+	) { }
 
 	async getTask(
 		request: FastifyRequest<{ Params: { taskId: string } }>,
 		response: FastifyReply,
 	) {
 		try {
-			const task = await this.taskUseCase.getTask(request.params.taskId);
+			const task = await this.getTaskUseCase.execute(request.params.taskId);
 
 			return response.status(200).send(task);
 		} catch (err) {
@@ -33,7 +37,9 @@ export class TaskController {
 				});
 			}
 
-			const task = await this.taskUseCase.createTask(parsed.data?.description);
+			const task = await this.createTaskUseCase.execute(
+				parsed.data?.description,
+			);
 
 			return response.status(200).send(task);
 		} catch (err) {
