@@ -1,4 +1,4 @@
-type TTask = {
+export type TTask = {
 	id: string;
 	description: string;
 	completed: boolean;
