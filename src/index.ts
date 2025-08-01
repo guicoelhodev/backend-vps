@@ -16,7 +16,7 @@ async function bootstrap() {
 			host: "0.0.0.0",
 		});
 
-		console.log("Server is now listening");
+		console.log("Server is now listening", process.env.PORT);
 	} catch (err) {
 		console.error("Failed to start server:", err);
 		process.exit(1);

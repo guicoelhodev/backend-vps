@@ -18,6 +18,8 @@ ENV NODE_ENV=$NODE_ENV
 ARG PORT
 ENV PORT=$PORT
 
+RUN npx prisma generate
+
 RUN npm run build
 
 EXPOSE 3000
